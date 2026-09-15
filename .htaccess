@@ -1,0 +1,26 @@
+# ── RaktSethu root security hardening ──────────────────────────────
+# Upload this as /thalassemia/.htaccess on Apache hosting.
+
+# 1. Never let anyone download your SQL schema/migrations from the browser
+<FilesMatch "\.(sql|log|ini|bak|md)$">
+  Require all denied
+</FilesMatch>
+
+# 2. Hide the .git folder if one is ever created here
+RedirectMatch 404 /\.git
+
+# 3. Disable directory listing site-wide
+Options -Indexes
+
+# 4. Security headers
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# 5. Force HTTPS (uncomment once your SSL certificate is active —
+#    InfinityFree offers free SSL in the control panel)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

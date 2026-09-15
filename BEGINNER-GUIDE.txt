@@ -1,0 +1,239 @@
+════════════════════════════════════════════════════════════════
+  RAKTSETHU — COMPLETE BEGINNER GUIDE
+  (GitHub + Deployment + Email + Cron — from zero, no commands needed)
+════════════════════════════════════════════════════════════════
+
+This guide has 5 parts. Do them in order:
+
+   PART A — Put the code on GitHub          (10 minutes)
+   PART B — Update your LIVE website        (10 minutes)
+   PART C — Set up email verification       (15 minutes)
+   PART D — Set up the automatic cron job   (10 minutes)
+   PART E — Final security checklist        (5 minutes)
+
+────────────────────────────────────────────────────────────────
+PART A — PUT THE CODE ON GITHUB
+────────────────────────────────────────────────────────────────
+
+WHY: GitHub is like a public portfolio of your code. Teachers,
+recruiters, and other developers can see your project. It also
+keeps a backup of your code forever.
+
+STEP A1. Create a GitHub account
+   - Go to https://github.com → click "Sign up" → follow the steps
+   - Use any username you like (e.g. yourname-dev)
+   - Verify your email when GitHub sends you the link
+
+STEP A2. Create a new repository (a repository = a project folder)
+   - Click the "+" icon (top right) → "New repository"
+   - Repository name: raktsethu
+   - Description: "Thalassemia Blood Support System — PHP/MySQL"
+   - Choose "Public" (so people can see your work)
+   - ✅ Tick "Add a README file" — wait, NO. Leave it UNticked.
+     (We already have a README in our files — ticking this
+      would create an empty one and cause a conflict.)
+   - Click the green "Create repository" button
+
+STEP A3. Upload the files (drag and drop — no commands needed!)
+   - You'll land on a page that says "Quick setup"
+   - Click the link that says "uploading an existing file"
+     (It's the small blue text near the bottom, under
+      "...or create a new repository on the command line")
+   - A file-upload area appears with a "drag files here" zone
+   - ⚠️ IMPORTANT: GitHub does not upload empty folders. Some
+     folders like uploads/reports/ may be empty — the .htaccess
+     file inside makes it non-empty, so they WILL upload fine.
+   - Open the "thalassemia" folder from this zip on your computer
+   - Select ALL files INSIDE it (README.md, .gitignore, admpanel,
+     assets, auth, config, cron, database, doctor_lab, donor,
+     engine, includes, patient, index.php, uploads, and any
+     other files/folders you see)
+   - Drag them ALL onto the GitHub upload area
+   - Wait for the progress bar to finish uploading every file
+   - Scroll down, type a message like "initial project upload"
+   - Click the green "Commit changes" button
+
+STEP A4. Check it worked
+   - Your repo page should now show README.md, and folders like
+     admpanel/, auth/, etc.
+   - Scroll the file list: you should NOT see a file called
+     "db.php" inside config/ (only db.php.example).
+     That's correct — your database password is not on GitHub.
+   - Click README.md — it should render as a nice project page.
+   - DONE! Your code is now on GitHub. 🎉
+
+────────────────────────────────────────────────────────────────
+PART B — UPDATE YOUR LIVE WEBSITE (rakhsethu.site.je)
+────────────────────────────────────────────────────────────────
+
+You already have the site running. This part updates it with the
+new security fixes + email verification.
+
+STEP B1. Log in to InfinityFree
+   - Go to https://dash.infinityfree.com → log in
+   - You should see your hosting account listed
+
+STEP B2. Open the File Manager
+   - On your account card, click "Open Panel" (or the "CP" button)
+   - This opens VistaPanel — your hosting control panel
+   - Find and click "File Manager" (usually under "Files")
+
+STEP B3. Navigate to the right folder
+   - In File Manager, navigate to: htdocs → thalassemia
+   - (Full path: /htdocs/thalassemia/ — this is your website folder)
+
+STEP B4. Run the database migration (adds email verification)
+   - In a NEW browser tab, from VistaPanel, click "phpMyAdmin"
+     (under "Databases")
+   - Log in with your database username + password
+   - Click your database name in the LEFT sidebar
+     (it looks like: if0_42736381_thalassemia)
+   - Click the "SQL" tab at the top
+   - From this zip, open database/migration_email_verification.sql
+     in Notepad, copy ALL its text, paste it into the SQL box
+   - Click "Go"
+   - You should see a green success message.
+     This marks all existing accounts (including admin) as
+     verified — nobody gets locked out.
+
+STEP B5. Upload the new/changed PHP files
+   In the File Manager (from Step B3), for EACH of these files:
+   right-click the existing file → Delete, then click "Upload"
+   and select the new version from this zip:
+
+   FROM auth/ folder:
+     - register.php        ← new (generates email token)
+     - login.php          ← new (blocks unverified users + brute-force protection)
+     - verify_notice.php  ← NEW file (the "check your email" page)
+     - verify_email.php   ← NEW file (activates account from email link)
+
+   FROM includes/ folder:
+     - functions.php      ← new (hardened sessions, CSRF fix)
+
+   FROM cron/ folder:
+     - expire_matches_http.php  ← new (secure token)
+
+   STEP B6. Upload the .htaccess files (blocks attackers)
+   - File Manager → in htdocs/thalassemia, click "Upload"
+   - Upload the file ".htaccess" from the zip root
+   - Navigate into database/ → upload the ".htaccess" there too
+   - Navigate into uploads/reports/ → upload the ".htaccess" there
+   - ⚠️ Some FTP programs hide files starting with a dot. In the
+     File Manager, click "Settings" (top right) → tick "Show hidden
+     files" → Save. Now you can see .htaccess files.
+
+   STEP B7. Delete setup_admin.php from the SERVER
+   - In File Manager, go to htdocs/thalassemia/database/
+   - Find setup_admin.php
+   - Right-click → Delete
+   - ⚠️ This is IMPORTANT. This file can create admin accounts.
+     It's protected by a secret token (in MY-SECRET-TOKENS.txt)
+     but the safest thing is to not have it on the server at all.
+     Only keep it if you plan to deploy fresh (see below).
+
+   STEP B8. Test the site
+   - Visit https://rakhsethu.site.je/thalassemia/
+   - Log in with your existing account — should still work
+   - Register a NEW test account → you should now see the
+     "Verify Your Email" page (it won't send until you do Part C)
+
+────────────────────────────────────────────────────────────────
+PART C — SET UP EMAIL VERIFICATION (EmailJS)
+────────────────────────────────────────────────────────────────
+
+InfinityFree doesn't let your website send emails directly, so we
+use a free service called EmailJS (200 emails/month free).
+
+Full detailed instructions with the exact email template text are
+in README-EMAIL.txt in this zip. The short version:
+
+STEP C1. Create account at https://www.emailjs.com (free)
+STEP C2. Add your Gmail as an Email Service → note the Service ID
+STEP C3. Create an email Template using the variables:
+          {{to_name}}, {{to_email}}, {{verification_link}}
+         → note the Template ID
+STEP C4. Get your Public Key from Account → General
+STEP C5. In the File Manager, edit auth/verify_notice.php on the
+         server (right-click → Edit). Find these three lines near
+         the top and paste your values between the quotes:
+
+         const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
+         const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
+         const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+
+STEP C6. Test: register a new account with a real email → click
+         "Send Verification Email" → check your inbox → click the
+         link → account activated → log in works.
+
+────────────────────────────────────────────────────────────────
+PART D — SET UP THE AUTOMATIC CRON JOB
+────────────────────────────────────────────────────────────────
+
+WHY: The system needs to automatically expire blood match requests
+that donors don't respond to within 12 hours. A "cron job" is a
+robot that visits a page on your site every few minutes.
+
+STEP D1. Create an account at https://cron-job.org (free)
+STEP D2. Click "Create Cronjob"
+STEP D3. Fill in:
+          - Title: RaktSethu match expiry
+          - URL: (your secret cron URL — it's in MY-SECRET-TOKENS.txt)
+          - Schedule: every 10 minutes (Advanced → minutes */10)
+          - Click "Create"
+STEP D4. Wait 10 minutes, refresh cron-job.org — you should see
+         the job running with "success" status.
+
+────────────────────────────────────────────────────────────────
+PART E — FINAL SECURITY CHECKLIST
+────────────────────────────────────────────────────────────────
+
+Tick each box when done:
+
+  □ Code is on GitHub (Part A) with NO db.php file in it
+  □ setup_admin.php deleted from the server (Part B7)
+  □ All .htaccess files uploaded (Part B6)
+  □ Email verification working (Part C)
+  □ Cron job running (Part D)
+  □ Enable free SSL: InfinityFree panel → "Free SSL Certificates"
+    → select rakhsethu.site.je → Issue. Then in File Manager,
+    edit htdocs/.htaccess (or htdocs/thalassemia/.htaccess) and
+    REMOVE the "#" at the start of the two HTTPS redirect lines.
+  □ Change your MySQL password: InfinityFree panel → MySQL
+    Databases → change password → then edit config/db.php on the
+    server with the new password.
+    (Do this because the old password may have traveled in
+     earlier zip files you shared.)
+
+────────────────────────────────────────────────────────────────
+FRESH DEPLOY (only if you ever start from zero on a new host)
+────────────────────────────────────────────────────────────────
+
+1. Upload ALL files from this zip to htdocs/thalassemia/
+2. In phpMyAdmin: import database/schema.sql, then EVERY
+   migration_*.sql file in order (antispam, donor_engagement,
+   license_verification, notifications, security_question,
+   email_verification)
+3. Create config/db.php by copying config/db.php.example and
+   filling in your database details from the hosting panel
+4. Visit /thalassemia/database/setup_admin.php?token=YOUR_TOKEN
+   (token is in MY-SECRET-TOKENS.txt) to create your admin account
+5. DELETE database/setup_admin.php from the server
+6. Follow Parts C, D, E above
+
+────────────────────────────────────────────────────────────────
+QUESTIONS? Common problems:
+
+"My site shows a blank page!"
+  → Check config/db.php exists and has the right credentials.
+
+"Emails never arrive!"
+  → Check spam folder. Check the 3 keys in verify_notice.php.
+    Check EmailJS dashboard — it shows if emails were sent.
+
+"Can't see .htaccess in File Manager!"
+  → Settings → tick "Show hidden files" → Save.
+
+"GitHub rejected my upload — file too large!"
+  → GitHub max is 100MB per file. Your project files are all
+    tiny, so this shouldn't happen. If it does, check you didn't
+    accidentally drag a folder containing huge files.

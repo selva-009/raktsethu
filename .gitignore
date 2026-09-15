@@ -1,0 +1,13 @@
+# ── Secrets — NEVER commit these ──────────────────────────
+config/db.php
+
+# ── User uploads — real files never go to GitHub ──────────
+uploads/reports/*
+!uploads/reports/.htaccess
+
+# ── Logs & temp files ─────────────────────────────────────
+*.log
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
