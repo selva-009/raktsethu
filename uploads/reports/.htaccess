@@ -1,0 +1,7 @@
+# ── uploads/reports/: medical report protection ────────────────────
+# Donor medical reports are PRIVATE. Filenames follow a guessable
+# pattern (donor_5_1726312345.pdf), so anyone who guesses a URL could
+# download a stranger's blood report. Block ALL direct access —
+# reports are served only through doctor_lab/view_report.php, which
+# checks that the requester is a logged-in doctor/lab or admin.
+Require all denied
