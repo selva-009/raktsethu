@@ -1,0 +1,33 @@
+<?php
+/**
+ * Database connection (PDO, MySQL).
+ *
+ * COPY this file to db.php on your server and fill in YOUR values.
+ * db.php is listed in .gitignore, so your credentials never reach GitHub.
+ *
+ * On InfinityFree, find your values in the control panel:
+ *   Accounts → MySQL Databases → your database name
+ *   (host = sqlXXX.infinityfree.com, user = if0_XXXXXX, password = the one you set)
+ */
+
+define('DB_HOST', 'YOUR_DB_HOST');      // e.g. sql110.infinityfree.com
+define('DB_NAME', 'YOUR_DB_NAME');      // e.g. if0_42736381_thalassemia
+define('DB_USER', 'YOUR_DB_USER');      // e.g. if0_42736381
+define('DB_PASS', 'YOUR_DB_PASSWORD');
+
+try {
+    $pdo = new PDO(
+        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
+        DB_USER,
+        DB_PASS,
+        [
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES   => false,
+        ]
+    );
+} catch (PDOException $e) {
+    // Never leak DB credentials or raw exception details to the browser.
+    error_log('DB connection failed: ' . $e->getMessage());
+    die('A system error occurred. Please try again later.');
+}
