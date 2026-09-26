@@ -7,10 +7,54 @@ $userId = null;
 $securityQuestion = '';
 $error = '';
 
+// Two reset methods: by email link (default) or by security question
+$method = ($_GET['method'] ?? 'email');
+if ($method !== 'question') {
+    $method = 'email';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
 
+    if (($_POST['action'] ?? '') === 'email') {
+        // ── Reset by EMAIL LINK ─────────────────────────────────────
+        // Look up the account, mint a single-use 1-hour reset token,
+        // and let reset_sent.php deliver the email (via EmailJS —
+        // InfinityFree blocks server-side mail).
+        $method = 'email';
+        $email = trim($_POST['email'] ?? '');
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Please enter a valid email address.';
+        } else {
+            $stmt = $pdo->prepare('SELECT userId, name, emailVerified FROM users WHERE email = ? LIMIT 1');
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+
+            if ($user && (int) $user['emailVerified'] === 1) {
+                // Generate a single-use token (replaces any older one)
+                $resetToken = bin2hex(random_bytes(32));
+                $pdo->prepare('UPDATE users SET resetToken = ?, resetTokenAt = NOW() WHERE userId = ?')
+                    ->execute([$resetToken, $user['userId']]);
+                $_SESSION['pending_reset'] = [
+                    'name'  => $user['name'],
+                    'email' => $email,
+                    'token' => $resetToken,
+                ];
+            } else {
+                // Unknown or unverified email — same next page, generic
+                // message (prevents probing which emails are registered)
+                $_SESSION['pending_reset'] = [
+                    'email' => $email,
+                    'token' => null,
+                ];
+            }
+            redirect('/thalassemia/auth/reset_sent.php');
+        }
+    }
+
     if (($_POST['step'] ?? '') === '1') {
+        $method = 'question';
         // Step 1: User enters email + phone + security answer — all three at once
         $email         = trim($_POST['email'] ?? '');
         $phone         = trim($_POST['phone'] ?? '');
@@ -89,7 +133,16 @@ require __DIR__ . '/../includes/header.php';
     <div class="flash flash-error"><?= h($error) ?></div>
   <?php endif; ?>
 
-  <!-- Progress indicator -->
+  <?php if ($step === 1): ?>
+    <!-- Method switcher (same tab style as the register page) -->
+    <div class="role-tabs">
+      <a class="<?= $method === 'email' ? 'active' : '' ?>" href="?method=email">Email Link</a>
+      <a class="<?= $method === 'question' ? 'active' : '' ?>" href="?method=question">Security Question</a>
+    </div>
+  <?php endif; ?>
+
+  <?php if ($method === 'question' || $step > 1): ?>
+  <!-- Progress indicator (only for the security-question flow) -->
   <div class="fp-steps">
     <span class="fp-step <?= $step >= 1 ? 'active' : '' ?> <?= $step > 1 ? 'done' : '' ?>">1</span>
     <div class="fp-line <?= $step > 1 ? 'active' : '' ?>"></div>
@@ -98,9 +151,22 @@ require __DIR__ . '/../includes/header.php';
   <div class="fp-labels">
     <span>Verify Identity</span><span>Reset Password</span>
   </div>
+  <?php endif; ?>
 
-  <?php if ($step === 1): ?>
-    <!-- Step 1: Verify identity — email + phone + security answer -->
+  <?php if ($step === 1 && $method === 'email'): ?>
+    <!-- Method 1 (default): send a reset link by email -->
+    <form method="post">
+      <input type="hidden" name="csrf" value="<?= h(csrfToken()) ?>">
+      <input type="hidden" name="action" value="email">
+      <p class="muted" style="font-size:0.75rem;margin-bottom:12px;">Enter your registered email and we'll send you a reset link (valid for 1 hour).</p>
+      <label>Registered Email
+        <input type="email" name="email" required autofocus placeholder="you@example.com">
+      </label>
+      <button type="submit" class="btn-primary">Email Me a Reset Link</button>
+    </form>
+
+  <?php elseif ($step === 1): ?>
+    <!-- Method 2: verify identity — email + phone + security answer -->
     <form method="post">
       <input type="hidden" name="csrf" value="<?= h(csrfToken()) ?>">
       <input type="hidden" name="step" value="1">

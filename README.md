@@ -9,7 +9,8 @@ A web platform connecting thalassemia patients with compatible blood donors, doc
 - **Doctor / Lab side** — request creation on behalf of patients, donor report verification, NMC license verification (SurePass API)
 - **Matching engine** — blood-group compatibility matrix (server-side), automatic donor matching, 12-hour response deadline with expiry
 - **Admin panel** — user management, report verification, license approval, dashboard analytics
-- **Security** — email verification on signup, security-question password recovery, CSRF tokens on all forms, brute-force login lockout, prepared statements everywhere, XSS escaping, upload protection via .htaccess
+- **Security** — email verification on signup, password reset by email link (single-use, 1-hour token) or security question, CSRF tokens on all forms, brute-force login lockout, prepared statements everywhere, XSS escaping, upload protection via .htaccess
+- **Password recovery** — "Forgot password" offers an emailed reset link (default) or the original email + phone + security-question flow; expired verification links automatically issue a fresh token instead of dead-ending the user
 
 ## Tech Stack
 
@@ -20,6 +21,8 @@ A web platform connecting thalassemia patients with compatible blood donors, doc
 | Frontend | HTML, CSS, vanilla JS |
 | Email | EmailJS (client-side delivery — works on hosts that block outbound email) |
 | Hosting tested | InfinityFree (Apache), XAMPP (local) |
+
+> **Email setup:** all outgoing mail (verification + password reset) is delivered via EmailJS from the user's browser, because free hosts block server-side email. Fill in your keys once in `config/email.php` — see `README-EMAIL.txt` for the 10-minute setup guide.
 
 ## Project Structure
 

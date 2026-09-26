@@ -12,27 +12,58 @@
  *   - the activation link is validated by verify_email.php on the server.
  * The browser's only job is delivering the email containing the link.
  *
- * ONE-TIME SETUP (see README-EMAIL.txt in this zip):
+ * ONE-TIME SETUP (see README-EMAIL.txt for full detail):
  *   1. Create a free account at https://www.emailjs.com
  *   2. Add your Gmail as an Email Service → copy the Service ID
  *   3. Create an email Template (variables used: to_name, to_email,
  *      verification_link) → copy the Template ID
  *   4. Account → General → copy your Public Key
- *   5. Fill the three constants below.
+ *   5. Fill the constants in config/email.php (shared by every
+ *      email-sending page — verification AND password reset).
  */
-
-// ── EMAILJS CONFIG — FILL THESE IN ────────────────────────────────
-const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';
-const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../includes/functions.php';
+// EmailJS keys now live in ONE central file — fill them in there.
+// (Copy config/db.php.example style: config/email.php)
+require_once __DIR__ . '/../config/email.php';
 
 // Session must have a pending verification (set by register.php / login.php)
 $pending = $_SESSION['pending_verification'] ?? null;
 if (!$pending || empty($pending['email']) || empty($pending['token'])) {
     redirect('/thalassemia/auth/login.php');
+}
+
+// ── Keep the token fresh ──────────────────────────────────────────
+// If the session token is stale (already used, replaced by another
+// attempt, or older than 2 hours), refresh or regenerate it so the
+// "Send" button always mails a link with a full validity window.
+$stmt = $pdo->prepare('SELECT verificationToken, verificationTokenAt, emailVerified FROM users WHERE userId = ?');
+$stmt->execute([(int) $pending['userId']]);
+$row = $stmt->fetch();
+
+if ($row && (int) $row['emailVerified'] === 1) {
+    // Already verified — nothing left to send
+    unset($_SESSION['pending_verification']);
+    setFlash('success', 'This email is already verified — please log in.');
+    redirect('/thalassemia/auth/login.php');
+}
+
+$needNewToken = false;
+if (!$row || empty($row['verificationToken'])) {
+    $needNewToken = true;                                  // token was consumed/cleared
+} elseif ($row['verificationToken'] !== $pending['token']) {
+    $pending['token'] = $row['verificationToken'];          // DB has a newer token — sync
+    $_SESSION['pending_verification'] = $pending;
+} elseif (!empty($row['verificationTokenAt'])
+          && (time() - strtotime($row['verificationTokenAt'])) > 7200) {
+    $needNewToken = true;                                   // older than 2h → fresh 24h window
+}
+if ($needNewToken) {
+    $pending['token'] = bin2hex(random_bytes(32));
+    $pdo->prepare('UPDATE users SET verificationToken = ?, verificationTokenAt = NOW() WHERE userId = ?')
+        ->execute([$pending['token'], (int) $pending['userId']]);
+    $_SESSION['pending_verification'] = $pending;
 }
 
 // Build the absolute verification link (works on http and https hosts)
@@ -96,7 +127,7 @@ require __DIR__ . '/../includes/header.php';
 
   function sendVerification() {
     if (PUBLIC_KEY.indexOf('YOUR_') === 0) {
-      status.textContent = 'Email sending is not configured yet — see README-EMAIL.txt.';
+      status.textContent = 'Email sending is not configured yet — fill in config/email.php (guide: README-EMAIL.txt).';
       status.style.color = '#b45309';
       return;
     }
