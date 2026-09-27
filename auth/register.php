@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($honeypot !== '') {
         // Silently reject — pretend it worked but don't create account
         setFlash('success', 'Account created. Please log in.');
-        redirect('/thalassemia/auth/login.php');
+        redirect(BASE_URL . '/auth/login.php');
     }
 
     // --- Anti-spam: Math CAPTCHA ---
@@ -146,7 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email'  => $email,
                 'token'  => $verifyToken,
             ];
-            redirect('/thalassemia/auth/verify_notice.php');
+            redirect(BASE_URL . '/auth/verify_notice.php');
         } catch (Throwable $e) {
             $pdo->rollBack();
             error_log('Registration failed: ' . $e->getMessage());
@@ -332,7 +332,7 @@ require __DIR__ . '/../includes/header.php';
     })();
     </script>
 
-    <p class="auth-links">Already have an account? <a href="/thalassemia/auth/login.php">Log in</a></p>
+    <p class="auth-links">Already have an account? <a href="<?= BASE_URL ?>/auth/login.php">Log in</a></p>
   </div>
 </div>
 
