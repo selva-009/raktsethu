@@ -18,7 +18,7 @@ if (!empty($_SESSION['userId'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= h($pageTitle) ?> — RaktSethu</title>
-  <link rel="stylesheet" href="/thalassemia/assets/css/style.css?v=gold2028">
+  <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css?v=gold2028">
   <link rel="preconnect" href="https://fonts.googleapis.com/">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 </head>
@@ -30,7 +30,7 @@ if (!empty($_SESSION['userId'])) {
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 <header class="site-header">
-  <a class="brand" href="/thalassemia/index.php">
+  <a class="brand" href="<?= BASE_URL ?>/index.php">
     <span class="brand-icon heartbeat">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4af37" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 2.5 C12 2.5, 19 9, 19 14 C19 17.5, 16 20, 12 20 C8 20, 5 17.5, 5 14 C5 9, 12 2.5, 12 2.5Z"/>
@@ -43,15 +43,15 @@ if (!empty($_SESSION['userId'])) {
   <?php if (!empty($_SESSION['userId'])): ?>
     <nav class="nav">
       <?php if ($_SESSION['role'] === 'patient'): ?>
-        <a href="/thalassemia/patient/dashboard.php">Dashboard</a>
+        <a href="<?= BASE_URL ?>/patient/dashboard.php">Dashboard</a>
       <?php elseif ($_SESSION['role'] === 'donor'): ?>
-        <a href="/thalassemia/donor/dashboard.php">Dashboard</a>
-        <a href="/thalassemia/donor/upload_report.php">Upload Report</a>
+        <a href="<?= BASE_URL ?>/donor/dashboard.php">Dashboard</a>
+        <a href="<?= BASE_URL ?>/donor/upload_report.php">Upload Report</a>
       <?php elseif ($_SESSION['role'] === 'doctor_lab'): ?>
-        <a href="/thalassemia/doctor_lab/dashboard.php">Dashboard</a>
+        <a href="<?= BASE_URL ?>/doctor_lab/dashboard.php">Dashboard</a>
       <?php elseif ($_SESSION['role'] === 'admin'): ?>
-        <a href="/thalassemia/admpanel/dashboard.php">Dashboard</a>
-        <a href="/thalassemia/admpanel/manage_users.php">Manage Users</a>
+        <a href="<?= BASE_URL ?>/admpanel/dashboard.php">Dashboard</a>
+        <a href="<?= BASE_URL ?>/admpanel/manage_users.php">Manage Users</a>
       <?php endif; ?>
 
       <?php if ($unreadCount > 0): ?>
@@ -65,7 +65,7 @@ if (!empty($_SESSION['userId'])) {
       <?php endif; ?>
 
       <span class="nav-user"><?= h($_SESSION['name']) ?> · <?= h(ucfirst(str_replace('_', '/', $_SESSION['role']))) ?></span>
-      <a class="logout" href="/thalassemia/auth/logout.php">Logout</a>
+      <a class="logout" href="<?= BASE_URL ?>/auth/logout.php">Logout</a>
     </nav>
   <?php endif; ?>
 </header>

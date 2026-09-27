@@ -3,22 +3,34 @@
  * HTTP-triggerable version of the 48-hour auto-expiry sweep, for hosts that
  * don't allow scheduled CLI tasks (e.g. most free hosts).
  *
- * SECURITY-HARDENED VERSION:
- *   1. TRIGGER_TOKEN below is set to a long random value. CHANGE IT to your
- *      own before uploading — generate one at https://randomkeygen.com
- *      (64+ character hex string) or run:
- *        php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
- *   2. After changing the token, update your cron-job.org scheduled URL to:
- *        https://yoursite.com/thalassemia/cron/expire_matches_http.php?token=YOUR_NEW_TOKEN
+ * SECURITY: the trigger token lives in config/cron_token.php (git-ignored) or
+ * in the CRON_TRIGGER_TOKEN environment variable — never in this file.
+ * Schedule cron-job.org to hit:
+ *   https://yoursite.com/cron/expire_matches_http.php?token=YOUR_TOKEN
  */
 
-// CHANGE THIS — generate your own 64-character random string before uploading.
-define('TRIGGER_TOKEN', '72952346664e28c54354db767a6975d91077c64a5b944655');
+// SECURITY: the trigger token is loaded from config/cron_token.php, which is
+// git-ignored, so it never enters version control. To set it up:
+//   1. Copy config/cron_token.php.example -> config/cron_token.php
+//   2. Paste a 64-char random string inside it
+//   3. Point cron-job.org at: https://yoursite.com[/folder]/cron/expire_matches_http.php?token=YOUR_TOKEN
+// (Alternative: set a CRON_TRIGGER_TOKEN environment variable on the server.)
+$raktsethuCronTokenFile = __DIR__ . '/../config/cron_token.php';
+$raktsethuCronToken = is_file($raktsethuCronTokenFile) ? (require $raktsethuCronTokenFile) : '';
+if (!is_string($raktsethuCronToken)) {
+    $raktsethuCronToken = '';
+}
+define('TRIGGER_TOKEN', $raktsethuCronToken !== '' ? $raktsethuCronToken : (getenv('CRON_TRIGGER_TOKEN') ?: ''));
 
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../engine/matching_engine.php';
 
 header('Content-Type: text/plain; charset=utf-8');
+
+if (TRIGGER_TOKEN === '') {
+    http_response_code(503);
+    die('Cron trigger token is not configured. Copy config/cron_token.php.example to config/cron_token.php and set a random token.');
+}
 
 $token = $_GET['token'] ?? '';
 if (!hash_equals(TRIGGER_TOKEN, $token)) {

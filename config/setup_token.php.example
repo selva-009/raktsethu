@@ -1,0 +1,8 @@
+<?php
+/**
+ * One-time admin setup token (git-ignored).
+ * Copy this file to setup_token.php on your server and paste a long random
+ * string between the quotes. Used by database/setup_admin.php only.
+ * DELETE database/setup_admin.php from the server after creating your admin.
+ */
+return 'PASTE_YOUR_LONG_RANDOM_SETUP_TOKEN_HERE';

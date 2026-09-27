@@ -24,6 +24,31 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+
+/**
+ * Base URL path under which the app is deployed, WITHOUT a trailing slash.
+ * Detected automatically from the current request so the app works at the
+ * domain root, in any subfolder, on any host:
+ *   deployed at https://example.com/            ->  ''
+ *   deployed at https://example.com/thalassemia -> '/thalassemia'
+ * All internal links/redirects must use BASE_URL . '/...' instead of a
+ * hardcoded '/thalassemia/...' path.
+ */
+$raktsethuAppRoot   = str_replace('\\', '/', dirname(__DIR__));
+$raktsethuScriptFile = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME'] ?? '');
+$raktsethuScriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+$raktsethuBase = '';
+if ($raktsethuScriptFile !== '' && $raktsethuScriptName !== ''
+    && str_starts_with($raktsethuScriptFile, $raktsethuAppRoot)
+    && str_ends_with($raktsethuScriptName, substr($raktsethuScriptFile, strlen($raktsethuAppRoot)))) {
+    $raktsethuBase = rtrim(
+        substr($raktsethuScriptName, 0, strlen($raktsethuScriptName)
+            - (strlen($raktsethuScriptFile) - strlen($raktsethuAppRoot))),
+        '/'
+    );
+}
+define('BASE_URL', $raktsethuBase);
+
 /** Redirect to $url and stop execution. */
 function redirect(string $url): void {
     header("Location: $url");
@@ -33,7 +58,7 @@ function redirect(string $url): void {
 /** Require an active session with one of the given roles; otherwise redirect to login. */
 function requireRole(array $allowedRoles): void {
     if (empty($_SESSION['userId']) || !in_array($_SESSION['role'], $allowedRoles, true)) {
-        redirect('/thalassemia/auth/login.php');
+        redirect(BASE_URL . '/auth/login.php');
     }
 }
 
@@ -107,7 +132,7 @@ function verifyCsrf(): void {
 
         setFlash('error', 'Your session expired. Please try again.');
 
-        $referer = $_SERVER['HTTP_REFERER'] ?? '/thalassemia/index.php';
+        $referer = $_SERVER['HTTP_REFERER'] ?? BASE_URL . '/index.php';
         header("Location: $referer");
         exit;
     }

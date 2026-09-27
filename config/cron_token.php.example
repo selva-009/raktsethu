@@ -1,0 +1,9 @@
+<?php
+/**
+ * Cron trigger token (git-ignored).
+ * Copy this file to cron_token.php on your server and paste a random
+ * 64-character hex string between the quotes. Generate one at
+ * https://randomkeygen.com or run:
+ *   php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+ */
+return 'PASTE_YOUR_64_CHARACTER_RANDOM_TOKEN_HERE';

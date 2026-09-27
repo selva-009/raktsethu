@@ -11,3 +11,7 @@ uploads/reports/*
 *.tmp
 .DS_Store
 Thumbs.db
+
+# ── Runtime secrets (copy the .example files and fill in) ──
+config/cron_token.php
+config/setup_token.php
