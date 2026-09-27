@@ -55,8 +55,9 @@ See `BEGINNER-GUIDE.txt` in this repo for a complete step-by-step guide (GitHub 
 - `config/db.php` is git-ignored — credentials never enter version control
 - `uploads/reports/` is served only through authenticated PHP (`doctor_lab/view_report.php`), direct access is denied by `.htaccess`
 - `database/` folder is web-blocked via `.htaccess`
-- Admin bootstrap script `database/setup_admin.php` is token-protected — **delete it from the server after creating your admin account**
-- Cron endpoint is token-protected; the token lives in `cron/expire_matches_http.php`
+- Cron endpoint is token-protected; the token lives in `config/cron_token.php` (git-ignored, see `config/cron_token.php.example`)
+- One-time admin setup is token-protected via `config/setup_token.php` (git-ignored) — and **delete `database/setup_admin.php` from the server after creating your admin account**
+- All internal links/redirects use an auto-detected `BASE_URL`, so the app works deployed at the domain root or in any subfolder — no hardcoded paths to edit
 
 ## Credits
 

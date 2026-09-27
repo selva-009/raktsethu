@@ -4,10 +4,11 @@
  * (e.g. free hosts like InfinityFree, 000webhost).
  *
  * SECURITY NOTE — read this before uploading:
- *   1. This page is protected by a random SETUP_TOKEN below. Change it to
- *      your own long random string before uploading.
+ *   1. This page is protected by a random SETUP_TOKEN, loaded from
+ *      config/setup_token.php (git-ignored; see the .example file) or the
+ *      RAKTSETHU_SETUP_TOKEN environment variable — never from this file.
  *   2. Visit it ONCE at:
- *        https://yoursite.com/thalassemia/database/setup_admin.php?token=YOUR_TOKEN
+ *        https://yoursite.com[/folder]/database/setup_admin.php?token=YOUR_TOKEN
  *   3. As soon as it confirms the admin account was created, DELETE THIS
  *      FILE from your host (File Manager → delete). Leaving a working
  *      admin-creation endpoint live — even token-protected — is a risk
@@ -19,10 +20,20 @@
  * database/seed_admin.php from the command line and skip this file.
  */
 
-// CHANGE THIS before uploading — pick your own long random string.
-define('SETUP_TOKEN', '32a456b1d15f19a7a98c0f8cc8b62617b6573411dfe1b242');
+// SECURITY: the setup token is loaded from config/setup_token.php, which is
+// git-ignored, so it never enters version control. To set it up:
+//   1. Copy config/setup_token.php.example -> config/setup_token.php
+//   2. Paste a long random string inside it
+//   3. Visit: https://yoursite.com[/folder]/database/setup_admin.php?token=YOUR_TOKEN
+$raktsethuSetupTokenFile = __DIR__ . '/../config/setup_token.php';
+$raktsethuSetupToken = is_file($raktsethuSetupTokenFile) ? (require $raktsethuSetupTokenFile) : '';
+if (!is_string($raktsethuSetupToken)) {
+    $raktsethuSetupToken = '';
+}
+define('SETUP_TOKEN', $raktsethuSetupToken !== '' ? $raktsethuSetupToken : (getenv('RAKTSETHU_SETUP_TOKEN') ?: ''));
 
 require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/functions.php';
 
 header('Content-Type: text/html; charset=utf-8');
 
@@ -85,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if ($done) {
     page(
         '<h1>Admin account created</h1>'
-      . '<p>You can now log in at <code>/thalassemia/admpanel/login_admin.php</code>.</p>'
+      . '<p>You can now log in at <code>' . BASE_URL . '/admpanel/login_admin.php</code>.</p>'
       . '<p style="color:#b3261e"><strong>Now delete this file (setup_admin.php) from your host.</strong></p>'
     );
 }

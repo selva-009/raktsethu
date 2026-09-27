@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (is_dir($uploadDir)) @chmod($uploadDir, 0777);
         $safeName = 'donor_' . $donor['donorId'] . '_' . time() . '.' . $ext;
         $destination = $uploadDir . $safeName;
-        $publicUrl = '/thalassemia/uploads/reports/' . $safeName;
+        $publicUrl = BASE_URL . '/uploads/reports/' . $safeName;
         $uploaded = false;
         if (@move_uploaded_file($_FILES['report']['tmp_name'], $destination)) $uploaded = true;
         elseif (@copy($_FILES['report']['tmp_name'], $destination)) { @unlink($_FILES['report']['tmp_name']); $uploaded = true; }
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($uploaded) {
             $pdo->prepare('INSERT INTO donor_reports (donorId, fileUrl, expiryDate) VALUES (?, ?, DATE_ADD(CURDATE(), INTERVAL 1 YEAR))')->execute([$donor['donorId'], $publicUrl]);
             setFlash('success', 'Report uploaded successfully. A doctor/lab will verify it shortly.');
-            redirect('/thalassemia/donor/dashboard.php');
+            redirect(BASE_URL . '/donor/dashboard.php');
         } else $errors[] = 'Upload failed. Could not save the file.';
     }
 }

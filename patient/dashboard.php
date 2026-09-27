@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'raise
     } catch (RuntimeException $e) {
         setFlash('error', $e->getMessage());
     }
-    redirect('/thalassemia/patient/dashboard.php');
+    redirect(BASE_URL . '/patient/dashboard.php');
 }
 
 $reqStmt = $pdo->prepare(

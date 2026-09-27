@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('error', $e->getMessage());
         }
     }
-    redirect('/thalassemia/donor/dashboard.php');
+    redirect(BASE_URL . '/donor/dashboard.php');
 }
 
 $donorStmt->execute([$_SESSION['userId']]);
@@ -238,7 +238,7 @@ require __DIR__ . '/../includes/header.php';
 <section class="card">
   <h2>Appreciation Certificate</h2>
   <p style="margin-bottom:12px;">You've earned a digital appreciation certificate for your verified blood donations!</p>
-  <a href="/thalassemia/donor/download_certificate.php" class="btn-certificate" target="_blank">
+  <a href="<?= BASE_URL ?>/donor/download_certificate.php" class="btn-certificate" target="_blank">
     📜 Download Certificate
   </a>
 </section>

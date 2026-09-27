@@ -20,7 +20,7 @@ $totalUnits = array_sum(array_map(fn($d) => (int)$d['units'], $verifiedDonations
 
 if ($totalDonations === 0) {
     setFlash('error', 'No verified donations yet. You need at least one verified donation to download a certificate.');
-    redirect('/thalassemia/donor/dashboard.php');
+    redirect(BASE_URL . '/donor/dashboard.php');
 }
 
 $donorName = $donor['name'];
