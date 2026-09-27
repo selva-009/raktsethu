@@ -16,7 +16,7 @@ requireRole(['admin']);
 $doctorId = (int) ($_GET['doctorId'] ?? $_POST['doctorId'] ?? 0);
 if (!$doctorId) {
     setFlash('error', 'Missing doctor ID.');
-    redirect('/thalassemia/admpanel/dashboard.php');
+    redirect(BASE_URL . '/admpanel/dashboard.php');
 }
 
 // Fetch doctor/lab details
@@ -31,7 +31,7 @@ $doctor = $stmt->fetch();
 
 if (!$doctor) {
     setFlash('error', 'Doctor/Lab not found.');
-    redirect('/thalassemia/admpanel/dashboard.php');
+    redirect(BASE_URL . '/admpanel/dashboard.php');
 }
 
 // Handle manual admin actions
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('error', 'Verification result: ' . $result['details']);
         }
 
-        redirect('/thalassemia/admpanel/verify_license.php?doctorId=' . $doctorId);
+        redirect(BASE_URL . '/admpanel/verify_license.php?doctorId=' . $doctorId);
     }
 
     if ($action === 'manual_approve') {
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         notify($pdo, (int) $doctor['userId'],
             'Your lab registration has been approved by the admin. You can now verify donor reports.');
         setFlash('success', 'Doctor/Lab manually approved.');
-        redirect('/thalassemia/admpanel/verify_license.php?doctorId=' . $doctorId);
+        redirect(BASE_URL . '/admpanel/verify_license.php?doctorId=' . $doctorId);
     }
 
     if ($action === 'manual_reject') {
@@ -142,10 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         notify($pdo, (int) $doctor['userId'],
             'Your lab registration was not approved. Reason: ' . $notes);
         setFlash('success', 'Doctor/Lab rejected.');
-        redirect('/thalassemia/admpanel/verify_license.php?doctorId=' . $doctorId);
+        redirect(BASE_URL . '/admpanel/verify_license.php?doctorId=' . $doctorId);
     }
 
-    redirect('/thalassemia/admpanel/verify_license.php?doctorId=' . $doctorId);
+    redirect(BASE_URL . '/admpanel/verify_license.php?doctorId=' . $doctorId);
 }
 
 // Fetch verification history for this doctor
@@ -298,6 +298,6 @@ require __DIR__ . '/../includes/header.php';
 </section>
 <?php endif; ?>
 
-<p><a href="/thalassemia/admpanel/dashboard.php">&larr; Back to Dashboard</a></p>
+<p><a href="<?= BASE_URL ?>/admpanel/dashboard.php">&larr; Back to Dashboard</a></p>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

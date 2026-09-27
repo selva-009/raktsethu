@@ -138,7 +138,7 @@ require __DIR__ . '/../includes/header.php';
               </span>
             </td>
             <td>
-              <a href="/thalassemia/admpanel/verify_license.php?doctorId=<?= (int) $lab['doctorId'] ?>" class="btn-primary btn-sm">Verify License</a>
+              <a href="<?= BASE_URL ?>/admpanel/verify_license.php?doctorId=<?= (int) $lab['doctorId'] ?>" class="btn-primary btn-sm">Verify License</a>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -220,7 +220,7 @@ require __DIR__ . '/../includes/header.php';
             <td data-label="Last Verification"><?= h($d['verifyStatus'] ? ucfirst($d['verifyStatus']) : '-') ?></td>
             <td data-label="View Report">
               <?php if (isset($d['latestReportId'])): ?>
-                <a href="/thalassemia/doctor_lab/view_report.php?reportId=<?= (int) $d['latestReportId'] ?>" target="_blank">View</a>
+                <a href="<?= BASE_URL ?>/doctor_lab/view_report.php?reportId=<?= (int) $d['latestReportId'] ?>" target="_blank">View</a>
               <?php else: ?>
                 <span class="muted">No report</span>
               <?php endif; ?>
@@ -359,6 +359,6 @@ require __DIR__ . '/../includes/header.php';
   <?php endif; ?>
 </section>
 
-<p><a href="/thalassemia/admpanel/manage_users.php" class="btn-secondary">Manage users &rarr;</a></p>
+<p><a href="<?= BASE_URL ?>/admpanel/manage_users.php" class="btn-secondary">Manage users &rarr;</a></p>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>
