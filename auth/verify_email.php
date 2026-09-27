@@ -15,7 +15,7 @@ $token = $_GET['token'] ?? '';
 
 if ($token === '') {
     setFlash('error', 'Invalid verification link. No token provided.');
-    redirect('/thalassemia/auth/login.php');
+    redirect(BASE_URL . '/auth/login.php');
 }
 
 // Look up the token in the database
@@ -29,7 +29,7 @@ $user = $stmt->fetch();
 if (!$user) {
     // Either token is wrong, already verified, or doesn't exist
     setFlash('error', 'This verification link is invalid or has already been used.');
-    redirect('/thalassemia/auth/login.php');
+    redirect(BASE_URL . '/auth/login.php');
 }
 
 // Check if the token has expired (24-hour window)
@@ -40,7 +40,7 @@ if ($user['verificationTokenAt']) {
         $pdo->prepare('UPDATE users SET verificationToken = NULL, verificationTokenAt = NULL WHERE userId = ?')
             ->execute([$user['userId']]);
         setFlash('error', 'Your verification link has expired (older than 24 hours). Please register again.');
-        redirect('/thalassemia/auth/register.php');
+        redirect(BASE_URL . '/auth/register.php');
     }
 }
 
@@ -52,4 +52,4 @@ $pdo->prepare('UPDATE users SET emailVerified = 1, verificationToken = NULL, ver
 unset($_SESSION['pending_verification']);
 
 setFlash('success', 'Email verified! Your account is now active. Please log in.');
-redirect('/thalassemia/auth/login.php');
+redirect(BASE_URL . '/auth/login.php');

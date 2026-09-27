@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email'  => $user['email'],
                 'token'  => $user['verificationToken'],
             ];
-            redirect('/thalassemia/auth/verify_notice.php');
+            redirect(BASE_URL . '/auth/verify_notice.php');
         }
 
         session_regenerate_id(true);
@@ -69,11 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['role']   = $user['role'];
 
             redirect(match ($user['role']) {
-                'patient'    => '/thalassemia/patient/dashboard.php',
-                'donor'      => '/thalassemia/donor/dashboard.php',
-                'doctor_lab' => '/thalassemia/doctor_lab/dashboard.php',
-                'admin'      => '/thalassemia/admpanel/dashboard.php',
-                default      => '/thalassemia/index.php',
+                'patient'    => BASE_URL . '/patient/dashboard.php',
+                'donor'      => BASE_URL . '/donor/dashboard.php',
+                'doctor_lab' => BASE_URL . '/doctor_lab/dashboard.php',
+                'admin'      => BASE_URL . '/admpanel/dashboard.php',
+                default      => BASE_URL . '/index.php',
             });
         }
     }
@@ -100,7 +100,7 @@ require __DIR__ . '/../includes/header.php';
     <div class="flash flash-error"><?= h($error) ?></div>
   <?php endforeach; ?>
 
-  <form method="post" action="/thalassemia/auth/login.php">
+  <form method="post" action="<?= BASE_URL ?>/auth/login.php">
     <input type="hidden" name="csrf" value="<?= h(csrfToken()) ?>">
 
     <label>Email / Username
@@ -114,25 +114,25 @@ require __DIR__ . '/../includes/header.php';
     <button type="submit" class="btn-primary">Login</button>
   </form>
 
-  <a href="/thalassemia/auth/forgot_password.php" class="forgot-link">Forgot Password?</a>
+  <a href="<?= BASE_URL ?>/auth/forgot_password.php" class="forgot-link">Forgot Password?</a>
 
   <div class="auth-divider">New here? Register as</div>
   <div class="register-btns">
-    <a href="/thalassemia/auth/register.php?role=patient" class="btn-register">
+    <a href="<?= BASE_URL ?>/auth/register.php?role=patient" class="btn-register">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       Patient
     </a>
-    <a href="/thalassemia/auth/register.php?role=donor" class="btn-register">
+    <a href="<?= BASE_URL ?>/auth/register.php?role=donor" class="btn-register">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14l-7 7-7-7"/><path d="M19 5l-7 7-7-7"/></svg>
       Donor
     </a>
-    <a href="/thalassemia/auth/register.php?role=doctor_lab" class="btn-register">
+    <a href="<?= BASE_URL ?>/auth/register.php?role=doctor_lab" class="btn-register">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 C12 2.5, 19 9, 19 14 C19 17.5, 16 20, 12 20 C8 20, 5 17.5, 5 14 C5 9, 12 2.5, 12 2.5Z"/></svg>
       Doctor / Lab
     </a>
   </div>
 
-  <a href="/thalassemia/admpanel/login_admin.php" class="admin-login-link">Admin login</a>
+  <a href="<?= BASE_URL ?>/admpanel/login_admin.php" class="admin-login-link">Admin login</a>
 </div>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

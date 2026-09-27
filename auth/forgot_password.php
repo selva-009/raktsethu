@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->prepare('UPDATE users SET passwordHash = ? WHERE userId = ?')
                 ->execute([$hash, $userId]);
             setFlash('success', 'Password reset successfully. Please login with your new password.');
-            redirect('/thalassemia/auth/login.php');
+            redirect(BASE_URL . '/auth/login.php');
         }
     }
 }
@@ -145,7 +145,7 @@ require __DIR__ . '/../includes/header.php';
     </form>
   <?php endif; ?>
 
-  <a href="/thalassemia/auth/login.php" class="admin-login-link">← Back to Login</a>
+  <a href="<?= BASE_URL ?>/auth/login.php" class="admin-login-link">← Back to Login</a>
 </div>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>

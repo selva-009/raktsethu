@@ -32,14 +32,14 @@ require_once __DIR__ . '/../includes/functions.php';
 // Session must have a pending verification (set by register.php / login.php)
 $pending = $_SESSION['pending_verification'] ?? null;
 if (!$pending || empty($pending['email']) || empty($pending['token'])) {
-    redirect('/thalassemia/auth/login.php');
+    redirect(BASE_URL . '/auth/login.php');
 }
 
 // Build the absolute verification link (works on http and https hosts)
 $scheme = (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) ? $_SERVER['HTTP_X_FORWARDED_PROTO']
           : (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http'));
 $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$verifyLink = $scheme . '://' . $host . '/thalassemia/auth/verify_email.php?token=' . rawurlencode($pending['token']);
+$verifyLink = $scheme . '://' . $host . BASE_URL . '/auth/verify_email.php?token=' . rawurlencode($pending['token']);
 
 $pageTitle = 'Verify Your Email';
 require __DIR__ . '/../includes/header.php';
@@ -77,7 +77,7 @@ require __DIR__ . '/../includes/header.php';
     Didn't get the email? Check your spam folder, then press the button again.
   </p>
 
-  <a href="/thalassemia/auth/verify_email.php?token=<?= rawurlencode($pending['token']) ?>"
+  <a href="<?= BASE_URL ?>/auth/verify_email.php?token=<?= rawurlencode($pending['token']) ?>"
      class="admin-login-link" style="display:block;margin-top:8px;">
     Already clicked the link in your email? Continue →
   </a>
