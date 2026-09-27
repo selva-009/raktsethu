@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('success', 'User account removed.');
         }
     }
-    redirect('/thalassemia/admpanel/manage_users.php');
+    redirect(BASE_URL . '/admpanel/manage_users.php');
 }
 
 $roleFilter = $_GET['role'] ?? '';

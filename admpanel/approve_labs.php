@@ -5,7 +5,7 @@ require_once __DIR__ . '/../includes/functions.php';
 requireRole(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('/thalassemia/admpanel/dashboard.php');
+    redirect(BASE_URL . '/admpanel/dashboard.php');
 }
 verifyCsrf();
 
@@ -34,4 +34,4 @@ if ($doctorId && $action === 'approve') {
     setFlash('success', 'Lab registration rejected.');
 }
 
-redirect('/thalassemia/admpanel/dashboard.php');
+redirect(BASE_URL . '/admpanel/dashboard.php');

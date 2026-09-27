@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // buttons in the HTML below are a UX hint only, not a security control.
     if (!$lab['approved']) {
         setFlash('error', 'Your lab is not yet approved by the admin. You cannot verify reports until approval.');
-        redirect('/thalassemia/doctor_lab/dashboard.php');
+        redirect(BASE_URL . '/doctor_lab/dashboard.php');
     }
 
     if (in_array($action, ['approve', 'reject'], true) && $reportId) {
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             setFlash('error', 'Could not record the verification. Please try again.');
         }
     }
-    redirect('/thalassemia/doctor_lab/dashboard.php');
+    redirect(BASE_URL . '/doctor_lab/dashboard.php');
 }
 
 $queueStmt = $pdo->prepare(

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['userId'] = (int) $user['userId'];
         $_SESSION['name']   = $user['name'];
         $_SESSION['role']   = $user['role'];
-        redirect('/thalassemia/admpanel/dashboard.php');
+        redirect(BASE_URL . '/admpanel/dashboard.php');
     }
 }
 
