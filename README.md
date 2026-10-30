@@ -2,6 +2,8 @@
 
 A web platform connecting thalassemia patients with compatible blood donors, doctors, and diagnostic labs. Built with plain PHP (PDO) and MySQL.
 
+**[Live demo](https://rakhsetu.site.je/thalassemia/)**
+
 ## Features
 
 - **Patient side** — create blood requests, track match status, view verified donors
